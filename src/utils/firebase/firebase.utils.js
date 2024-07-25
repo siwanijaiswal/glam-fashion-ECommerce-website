@@ -4,6 +4,7 @@ import {
   signInWithPopup,
   signInWithRedirect,
   GoogleAuthProvider,
+  createUserWithEmailAndPassword,
 } from "firebase/auth";
 
 import {getFirestore, doc, getDoc, setDoc} from "firebase/firestore"
@@ -21,15 +22,18 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const firebaseApp = initializeApp(firebaseConfig);
 
-const provider = new GoogleAuthProvider();
-provider.setCustomParameters({
+const googleProvider = new GoogleAuthProvider();
+
+googleProvider.setCustomParameters({
     prompt:"select_account"
 })
 
 export const auth = getAuth();
-export const signInWithGooglePopUp=()=>signInWithPopup(auth,provider);
+export const signInWithGooglePopUp=()=>signInWithPopup(auth,googleProvider);
+export const signInWithGoogleRedirect = () =>signInWithRedirect(auth, googleProvider);
+
 //see its uses in signin file
 
 //take database from firebase
@@ -37,8 +41,10 @@ export const db =  getFirestore();
 
 //this function tells that give me document from db of users collections haivng this uid.. from userdocref
 //passing props as userAuth which is actually user in signin file.
-export const createUserDocumentFromAuth=async(userAuth)=>{
-const userDocRef = doc(db,'users',userAuth.uid);
+export const createUserDocumentFromAuth=async(userAuth,additionalInformation)=>{
+
+    if(!userAuth) return;
+  const userDocRef = doc(db,'users',userAuth.uid);
 
 //this userSnapshot will help to check if their exists document or not.
 const userSnapShot = await getDoc(userDocRef);
@@ -54,7 +60,8 @@ if(!userSnapShot.exists()){
         await setDoc(userDocRef,{
             displayName,
             email,
-            createdAt
+            createdAt,
+            ...additionalInformation
         });
 
     }catch(error){
@@ -64,4 +71,11 @@ if(!userSnapShot.exists()){
 
 //if userdata exists then return userDocRef
 return userDocRef;
+};
+
+export const createAuthUserWithEmailAndPassword =async(email, password)=>{
+
+    if(!email || !password) return;
+
+   return await createUserWithEmailAndPassword(auth,email,password)
 }

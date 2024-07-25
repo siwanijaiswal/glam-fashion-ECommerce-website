@@ -1,7 +1,7 @@
 import Home from './routes/home/home';
 import { Routes,Route} from 'react-router-dom';
 import Navigation from './routes/navigation/navigation'
-import SignIn from './routes/sign-in/sign-in';
+import Authentication from './routes/authentication/authentication';
 
 //nested routing i.e /home/shop
 const Shop=()=>{
@@ -20,8 +20,8 @@ const App=()=>{
       
       <Route path='/' element={<Navigation />}>
       <Route index element={ <Home />}/>
-      <Route path='/shop' element={<Shop />} />
-      <Route path='/sign-in' element={<SignIn />} />
+      <Route path='shop' element={<Shop />} />
+      <Route path='auth' element={<Authentication />} />
       </Route>
     </Routes>
   );
